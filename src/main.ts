@@ -16,6 +16,7 @@ async function bootstrap() {
     .setTitle('Elos API')
     .setDescription('Documentação da API para o front-end do sistema ELOS')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
