@@ -3,11 +3,13 @@ import { CreateSupportRequestDto } from './dto/create-support-request.dto';
 import { UpdateSupportRequestStatusDto } from './dto/update-support-request.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { SupportRequest, UserRole } from '@prisma/client';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class SupportRequestsService {
   constructor(
     private readonly prisma: DatabaseService,
+    private readonly userService: UserService
   ) {}
 
   public async create(createSupportRequestDto: CreateSupportRequestDto, userId: number): Promise<Omit<SupportRequest, "userId">> {
@@ -22,8 +24,22 @@ export class SupportRequestsService {
     return supportRequest;
   }
 
-  public findAll() {
-    return `This action returns all supportRequests`;
+  public async findAll(userId: number): Promise<SupportRequest[]> {
+    const user = await this.userService.findUserById(userId);
+
+    switch(user.role) {
+      case UserRole.USER:
+        return await this.prisma.supportRequest.findMany({where: { userId }});
+      case UserRole.ADMIN:
+        return await this.prisma.supportRequest.findMany({
+          where: { 
+            OR: [
+              { handledById: userId },
+              { handledById: null }
+            ]
+           }
+        });
+    }
   }
 
   public async findOne(id: number, userId: number, userRole: UserRole) {

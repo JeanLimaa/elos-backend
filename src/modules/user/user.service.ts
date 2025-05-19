@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, UserRole } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 
@@ -9,9 +9,15 @@ export class UserService {
     ) {}
 
     async findUserById(id: number) {
-        return this.prisma.user.findUnique({
+        const user = await this.prisma.user.findUnique({
             where: { id },
         });
+
+        if (!user) {
+            throw new NotFoundException('Usuário não encontrado.');
+        };
+
+        return user;
     };
 
     async findUserByEmail(email: string) {

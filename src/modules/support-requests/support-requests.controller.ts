@@ -27,8 +27,10 @@ export class SupportRequestsController {
   }
 
   @Get()
-  findAll() {
-    return this.supportRequestsService.findAll();
+  findAll(
+    @GetUser("id") userId: number
+  ) {
+    return this.supportRequestsService.findAll(userId);
   }
 
   @Get(':id')
