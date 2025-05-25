@@ -16,11 +16,13 @@ export class AuthService {
   public async register(createAuthDto: CreateAuthDto) {
     const hashedPassword = await bcrypt.hash(createAuthDto.password, 10);
 
-    return await this.userService.create({
+    const user = await this.userService.create({
       email: createAuthDto.email,
       password: hashedPassword,
       name: createAuthDto.name,
     });
+
+    return await this.createToken(user);
   }
 
   public async login(loginAuthDto: LoginAuthDto) {
@@ -33,10 +35,14 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(loginAuthDto.password, user.password);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Senha inválida.');
+      throw new UnauthorizedException('Senha incorreta.');
     }
 
-    const payload: UserPayload =  {
+    return await this.createToken(user);
+  }
+
+  private async createToken(user: UserPayload): Promise<{token: string} >{
+    const payload = {
       email: user.email,
       id: user.id,
       name: user.name,

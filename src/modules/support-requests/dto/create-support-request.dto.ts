@@ -4,7 +4,12 @@ import { IsString, Length } from "class-validator";
 import { IsEnum } from "class-validator";
 
 export class CreateSupportRequestDto {
-    @ApiProperty({description: 'Descrição da solicitação de apoio'})
+    @ApiProperty({
+        description: 'Descrição da solicitação de apoio', 
+        example: 'Estou com dificuldades técnicas para elaborar uma denúncia formal',
+        minLength: 3,
+        maxLength: 190,
+    })
     @IsString({message: 'A descrição deve ser uma string'})
     @Length(3, 190, {message: 'A descrição deve ter entre 3 e 190 caracteres'})
     description: string;
