@@ -17,7 +17,8 @@ export class SupportRequestsService {
       data: {
         description: createSupportRequestDto.description,
         type: createSupportRequestDto.type,
-        userId
+        userId,
+        title: createSupportRequestDto.title,
       }
     });
 

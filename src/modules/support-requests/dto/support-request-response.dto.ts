@@ -5,6 +5,9 @@ export class SupportRequestResponseDto {
   @ApiProperty({ example: 9 })
   id: number;
 
+  @ApiProperty({ example: 'Título da solicitação' })
+  title: string;
+
   @ApiProperty({ example: 'JURIDICO', enum: RequestType })
   type: RequestType;
 

@@ -5,6 +5,16 @@ import { IsEnum } from "class-validator";
 
 export class CreateSupportRequestDto {
     @ApiProperty({
+        description: 'Título da solicitação de apoio', 
+        example: 'Dúvida sobre como fazer uma denúncia',
+        minLength: 3,
+        maxLength: 50,
+    })
+    @IsString({message: 'O título deve ser uma string'})
+    @Length(3, 50, {message: 'O título deve ter entre 3 e 50 caracteres'})
+    title: string;
+
+    @ApiProperty({
         description: 'Descrição da solicitação de apoio', 
         example: 'Estou com dificuldades técnicas para elaborar uma denúncia formal',
         minLength: 3,
