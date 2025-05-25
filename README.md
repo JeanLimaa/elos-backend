@@ -52,7 +52,7 @@ npx prisma migrate dev
 
 ---
 
-## Compilar e rodar projeto
+## ▶️ Compilar e rodar projeto
 
 ```bash
 # development
@@ -64,3 +64,16 @@ npm run start:dev
 # production mode
 npm run start:prod
 ```
+
+---
+
+## 📘 Documentação da API (Swagger)
+
+O projeto conta com uma documentação automática via Swagger, acessível após rodar o projeto.
+
+- **URL local:** `http://localhost:3000/api-docs`
+
+Lá você pode:
+- Visualizar todos os endpoints disponíveis
+- Testar requisições diretamente no navegador
+- Ver os tipos e formatos dos dados esperados
