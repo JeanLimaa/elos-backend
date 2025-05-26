@@ -39,12 +39,14 @@ model User {
   password       String
   name           String
   role           UserRole  @default(USER)
-  createdAt      DateTime  @default(now())
+  createdAt      DateTime  @default(now()) @map("created_at")
 
   complaints     Complaint[]
 
   supportRequests SupportRequest[]  @relation("SupportOwner")
   supportRequestsHandled    SupportRequest[] @relation("SupportHandled")
+
+  @@map("users")
 }
 
 // denúncias feitas por usuários
@@ -54,16 +56,18 @@ model Complaint {
   title          String
   description    String
   location       String?         
-  eventDate      DateTime?       
-  attachmentUrl  String?         
+  eventDate      DateTime?       @map("event_date")
+  attachmentUrl  String?         @map("attachment_url")
   status         ComplaintStatus @default(RECEIVED)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
   
-  adminResponse       String?         // mensagem que o admin DEVE enviar para o usuário ao responder
+  adminResponse       String?        @map("admin_response") // mensagem que o admin DEVE enviar para o usuário ao responder
 
   user           User            @relation(fields: [userId], references: [id])
-  userId         Int
+  userId         Int   @map("user_id")
+
+  @@map("complaints")
 }
 
 // solicitações de suporte: jurídico ou psicológico
@@ -72,14 +76,16 @@ model SupportRequest {
   type          RequestType
   title         String
   description   String     
-  createdAt     DateTime    @default(now())
+  createdAt     DateTime    @default(now()) @map("created_at")
   status        ComplaintStatus @default(RECEIVED)
 
   // Relacionamento com o usuário que fez o pedido
   user        User     @relation("SupportOwner", fields: [userId], references: [id])
-  userId      Int
+  userId      Int       @map("user_id")
 
   // Relacionamento com o admin que atendeu (opcional)
   handledBy       User?    @relation("SupportHandled", fields: [handledById], references: [id])
-  handledById     Int?
+  handledById     Int?     @map("handled_by_id")
+
+  @@map("support_requests")
 }

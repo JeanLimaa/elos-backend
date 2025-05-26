@@ -13,14 +13,14 @@ SELECT
     c.title AS complaint_title,
     c.type AS complaint_type,
     c.status AS complaint_status,
-    c.createdAt AS complaint_created_at
-FROM complaint c
-JOIN user u ON c.userId = u.id;
+    c.created_at AS complaint_created_at
+FROM complaints c
+JOIN users u ON c.user_id = u.id;
 
 /* Encerrar denúncias IN_REVIEW há mais de 30 dias */
 CREATE PROCEDURE close_old_complaints()
 BEGIN
-    UPDATE complaint
+    UPDATE complaints
     SET status = 'COMPLETED'
     WHERE status = 'IN_REVIEW'
       AND DATEDIFF(CURDATE(), createdAt) > 30;
