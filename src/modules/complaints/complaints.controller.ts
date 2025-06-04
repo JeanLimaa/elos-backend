@@ -11,7 +11,7 @@ import {
   Request,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { CreateComplaintDto } from './dto/create-complaint.dto';
 import { UpdateComplaintStatusDto } from './dto/update-complaint.dto';
@@ -19,14 +19,20 @@ import { ComplaintsService } from './complaints.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/decorators/Roles.decorator';
 import { UserRole } from '@prisma/client';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { RoleGuard } from 'src/guards/roles.guard';
+import { GetUser } from 'src/decorators/GetUser.decorator';
+import { UserPayload } from '../auth/interfaces/UserPayload.interface';
 
-@ApiTags('Complaints')
+@ApiTags('Denúncias - Complaints')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard, RoleGuard)
 @Controller('complaints')
 export class ComplaintsController {
   constructor(private readonly complaintsService: ComplaintsService) {}
 
+  
+  @ApiConsumes('multipart/form-data')
   @Post()
   @UseInterceptors(
     FilesInterceptor('attachments', 5, {
@@ -39,27 +45,31 @@ export class ComplaintsController {
       }),
     }),
   )
-  @ApiConsumes('multipart/form-data')
   async create(
     @Body() dto: CreateComplaintDto,
     @UploadedFiles() files: Express.Multer.File[],
-    @Request() req,
+    @GetUser() user: UserPayload,
   ) {
-    return this.complaintsService.create(dto, files, req.user);
+    return this.complaintsService.create(dto, files, user);
   }
 
   @Get()
-  async findAll(@Request() req) {
-    return this.complaintsService.findAll(req.user);
+  async findAll(
+    @GetUser() user: UserPayload
+  ) {
+    return this.complaintsService.findAll(user);
   }
 
+
   @Get(':id')
-  async findOne(@Param('id') id: string, @Request() req) {
-    return this.complaintsService.findOne(id, req.user);
+  async findOne(
+    @Param('id') id: string, 
+    @GetUser() user: UserPayload
+  ) {
+    return this.complaintsService.findOne(id, user);
   }
 
   @Patch(':id/status')
-  @UseGuards(AuthGuard('jwt'))
   @Roles([UserRole.ADMIN])
   async updateStatus(
     @Param('id') id: string,

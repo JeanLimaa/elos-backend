@@ -3,23 +3,24 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { DatabaseService } from 'src/database/database.service';
 import { CreateComplaintDto } from './dto/create-complaint.dto';
 import { UpdateComplaintStatusDto } from './dto/update-complaint.dto';
 import { UserRole } from '@prisma/client';
+import { UserPayload } from '../auth/interfaces/UserPayload.interface';
 
 @Injectable()
 export class ComplaintsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: DatabaseService) {}
 
   async create(
     dto: CreateComplaintDto,
     files: Express.Multer.File[],
-    user: any,
+    user: UserPayload,
   ) {
     const attachmentUrl = files && files.length > 0 ? files[0].filename : null;
 
-    const createdComplaint = await this.prisma.complaint.create({
+    const complaint = await this.prisma.complaint.create({
       data: {
         type: dto.type,
         title: dto.title,
@@ -34,14 +35,13 @@ export class ComplaintsService {
     });
 
     if (attachmentUrl) {
-      (createdComplaint as any).attachmentUrl =
-        `http://localhost:3000/uploads/${attachmentUrl}`;
+      complaint.attachmentUrl = `${process.env.BASE_URL}/uploads/${attachmentUrl}`;
     }
 
-    return createdComplaint;
+    return complaint;
   }
 
-  async findAll(user: any) {
+  async findAll(user: UserPayload) {
     if (user.role === UserRole.ADMIN) {
       return this.prisma.complaint.findMany();
     }
@@ -51,7 +51,7 @@ export class ComplaintsService {
     });
   }
 
-  async findOne(id: string, user: any) {
+  async findOne(id: string, user: UserPayload) {
     const complaint = await this.prisma.complaint.findUnique({
       where: { id: Number(id) },
     });
