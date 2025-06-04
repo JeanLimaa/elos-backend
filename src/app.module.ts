@@ -7,12 +7,7 @@ import { ComplaintsModule } from './modules/complaints/complaints.module';
 import { SupportRequestsModule } from './modules/support-requests/support-requests.module';
 
 @Module({
-  imports: [
-    UserModule,
-    AuthModule,
-    ComplaintsModule,
-    SupportRequestsModule
-  ],
+  imports: [UserModule, AuthModule, ComplaintsModule, SupportRequestsModule],
   controllers: [AppController],
   providers: [AppService],
 })

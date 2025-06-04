@@ -20,6 +20,11 @@ export class SupportRequestResponseDto {
   @ApiProperty({ example: 'RECEIVED', enum: ComplaintStatus })
   status: ComplaintStatus;
 
-  @ApiProperty({ example: null, examples: [null, 1, 2, 3] , nullable: true, description: 'ID do administrador que está lidando com a solicitação' })
+  @ApiProperty({
+    example: null,
+    examples: [null, 1, 2, 3],
+    nullable: true,
+    description: 'ID do administrador que está lidando com a solicitação',
+  })
   handledById: number | null;
 }

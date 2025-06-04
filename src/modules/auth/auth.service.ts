@@ -12,7 +12,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
-  
+
   public async register(createAuthDto: CreateAuthDto) {
     const hashedPassword = await bcrypt.hash(createAuthDto.password, 10);
 
@@ -32,7 +32,10 @@ export class AuthService {
       throw new UnauthorizedException('Usuário não encontrado.');
     }
 
-    const isPasswordValid = await bcrypt.compare(loginAuthDto.password, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      loginAuthDto.password,
+      user.password,
+    );
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Senha incorreta.');
@@ -41,16 +44,16 @@ export class AuthService {
     return await this.createToken(user);
   }
 
-  private async createToken(user: UserPayload): Promise<{token: string} >{
+  private async createToken(user: UserPayload): Promise<{ token: string }> {
     const payload = {
       email: user.email,
       id: user.id,
       name: user.name,
       role: user.role,
-    }
+    };
 
-    return { 
+    return {
       token: await this.jwtService.signAsync(payload),
-    }
+    };
   }
 }

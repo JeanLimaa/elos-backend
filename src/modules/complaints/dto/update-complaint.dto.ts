@@ -1,4 +1,14 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateComplaintDto } from './create-complaint.dto';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { ComplaintStatus } from '@prisma/client';
 
-export class UpdateComplaintDto extends PartialType(CreateComplaintDto) {}
+export class UpdateComplaintStatusDto {
+  @IsEnum(ComplaintStatus)
+  @ApiProperty({ enum: ComplaintStatus })
+  status: ComplaintStatus;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({ required: false })
+  adminResponse?: string;
+}

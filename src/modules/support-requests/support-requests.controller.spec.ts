@@ -11,7 +11,9 @@ describe('SupportRequestsController', () => {
       providers: [SupportRequestsService],
     }).compile();
 
-    controller = module.get<SupportRequestsController>(SupportRequestsController);
+    controller = module.get<SupportRequestsController>(
+      SupportRequestsController,
+    );
   });
 
   it('should be defined', () => {

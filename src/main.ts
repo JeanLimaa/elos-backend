@@ -1,5 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { join } from 'path';
+import * as express from 'express';
 import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
@@ -7,10 +9,17 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors();
+  app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
 
   const logger = new Logger();
-  logger.log(`Server running on http://localhost:${process.env.PORT ?? 3000}`, 'Bootstrap');
-  logger.log(`Documentation running on http://localhost:${process.env.PORT ?? 3000}/api-docs`, 'Bootstrap');
+  logger.log(
+    `Server running on http://localhost:${process.env.PORT ?? 3000}`,
+    'Bootstrap',
+  );
+  logger.log(
+    `Documentation running on http://localhost:${process.env.PORT ?? 3000}/api-docs`,
+    'Bootstrap',
+  );
 
   const config = new DocumentBuilder()
     .setTitle('Elos API')
@@ -29,7 +38,8 @@ async function bootstrap() {
         const firstError = Object.values(errors[0].constraints)[0]; // Pega apenas a primeira mensagem de erro
         return new BadRequestException(firstError);
       },
-    }));
+    }),
+  );
 
   await app.listen(process.env.PORT ?? 3000);
 }

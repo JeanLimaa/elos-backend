@@ -24,6 +24,7 @@ cd elos-backend
 ```
 
 2. **Instale as dependências**
+
 ```bash
 npm install
 ```
@@ -33,13 +34,17 @@ npm install
 Copie o arquivo `.env.example` para `.env`:
 
 - Em Unix/macOS:
+
 ```bash
 cp .env.example .env
 ```
+
 - Em Windows (PowerShell):
+
 ```bash
 Copy-Item .env.example .env
 ```
+
 - Depois de criar o .env, edite os valores conforme necessário. (Em especial o usuario e senha do DATABASE_URL)
 
 ---
@@ -74,6 +79,7 @@ O projeto conta com uma documentação automática via Swagger, acessível após
 - **URL local:** `http://localhost:3000/api-docs`
 
 Lá você pode:
+
 - Visualizar todos os endpoints disponíveis
 - Testar requisições diretamente no navegador
 - Ver os tipos e formatos dos dados esperados
