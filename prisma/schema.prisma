@@ -32,6 +32,20 @@ enum RequestType {
   PSICOLOGICO
 }
 
+enum ProfessionalGender {
+  MALE
+  FEMALE            
+  NON_BINARY        
+  TRANSGENDER        
+  NO_PREFERENCE    
+}
+
+enum AttendanceType {
+  REMOTE
+  IN_PERSON
+  NO_PREFERENCE
+}
+
 // ->-> TABELAS DO BANCO DE DADOS <- //
 model User {
   id             Int    @id @default(autoincrement())
@@ -54,7 +68,7 @@ model Complaint {
   id             Int          @id @default(autoincrement())
   type           ComplaintType
   title          String
-  description    String
+  description    String           @db.VarChar(255)
   location       String?         
   eventDate      DateTime?       @map("event_date")
   status         ComplaintStatus @default(RECEIVED)
@@ -67,6 +81,9 @@ model Complaint {
   userId         Int   @map("user_id")
 
   ComplaintAttachments ComplaintAttachments[]
+
+  complaintLocation ComplaintLocation?
+
   @@map("complaints")
 }
 
@@ -97,5 +114,20 @@ model SupportRequest {
   handledBy       User?    @relation("SupportHandled", fields: [handledById], references: [id])
   handledById     Int?     @map("handled_by_id")
 
+  attendancePreference        AttendanceType       @default(NO_PREFERENCE)
+  professionalGenderPreference ProfessionalGender  @default(NO_PREFERENCE)
+
   @@map("support_requests")
+}
+
+model ComplaintLocation {
+  id         Int      @id @default(autoincrement())
+  place      String?
+  city       String?
+  state      String
+
+  complaint   Complaint? @relation(fields: [complaintId], references: [id])
+  complaintId Int?       @unique @map("complaint_id")
+
+  @@map("complaint_locations")
 }
