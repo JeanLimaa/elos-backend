@@ -27,6 +27,8 @@ export class SupportRequestsService {
           type: createSupportRequestDto.type,
           userId,
           title: createSupportRequestDto.title,
+          professionalGenderPreference: createSupportRequestDto.professionalGender,
+          attendancePreference: createSupportRequestDto.attendanceType,
         },
       });
 

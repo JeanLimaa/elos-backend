@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { RequestType } from '@prisma/client';
+import { AttendanceType, ProfessionalGender, RequestType } from '@prisma/client';
 import { IsString, Length } from 'class-validator';
 import { IsEnum } from 'class-validator';
 
@@ -33,4 +33,22 @@ export class CreateSupportRequestDto {
     message: `O tipo de solicitação deve ser um valor válido: ${Object.values(RequestType).join(', ')}`,
   })
   type: RequestType;
+
+  @IsEnum(ProfessionalGender, {
+    message: `O gênero profissional deve ser um valor válido: ${Object.values(ProfessionalGender).join(', ')}`,
+  })
+  @ApiProperty({
+    enum: ProfessionalGender,
+    description: 'Gênero profissional do solicitante',
+  })
+  professionalGender: ProfessionalGender;
+
+  @IsEnum(AttendanceType, {
+    message: `O tipo de atendimento deve ser um valor válido: ${Object.values(AttendanceType).join(', ')}`,
+  })
+  @ApiProperty({
+    enum: AttendanceType,
+    description: 'Tipo de atendimento solicitado',
+  })
+  attendanceType: AttendanceType;
 }
