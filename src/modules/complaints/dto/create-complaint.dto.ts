@@ -29,5 +29,5 @@ export class CreateComplaintDto {
 
   @IsOptional()
   @ApiProperty({ type: 'string', format: 'binary', required: false })
-  file?: Express.Multer.File | null;
+  attachments?: Express.Multer.File | null;
 }
