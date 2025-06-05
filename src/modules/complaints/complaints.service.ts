@@ -113,4 +113,22 @@ export class ComplaintsService {
       },
     });
   }
+
+  async remove(id: string, userId: number) {
+    const complaint = await this.prisma.complaint.findUnique({
+      where: { id: Number(id) },
+    });
+
+    if (!complaint) {
+      throw new NotFoundException('Denúncia não encontrada');
+    }
+
+    if (complaint.userId !== userId) {
+      throw new ForbiddenException('Você não tem permissão para remover esta denúncia');
+    }
+
+    await this.prisma.complaint.delete({
+      where: { id: Number(id) },
+    });
+  }
 }

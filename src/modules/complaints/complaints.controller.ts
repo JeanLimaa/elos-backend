@@ -9,6 +9,7 @@ import {
   UseInterceptors,
   UseGuards,
   HttpCode,
+  Delete,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -107,5 +108,19 @@ export class ComplaintsController {
     @Body() dto: UpdateComplaintStatusDto,
   ) {
     return this.complaintsService.updateStatus(id, dto);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'Denúncia removida com sucesso',
+  })
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Remover uma denúncia' })
+  @Delete(':id')
+  async remove(
+    @Param('id') id: string,
+    @GetUser("id") userId: number
+  ) {
+    return this.complaintsService.remove(id, userId);
   }
 }
