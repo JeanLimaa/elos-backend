@@ -28,6 +28,13 @@ export class CreateComplaintDto {
   eventDate: string;
 
   @IsOptional()
-  @ApiProperty({ type: 'string', format: 'binary', required: false })
-  attachments?: Express.Multer.File | null;
+  @ApiProperty({ 
+    type: 'array',
+    items: {
+      type: 'string',
+      format: 'binary',
+    }, 
+    required: false 
+  })
+  attachments?: string[];
 }

@@ -57,7 +57,6 @@ model Complaint {
   description    String
   location       String?         
   eventDate      DateTime?       @map("event_date")
-  attachmentUrl  String?         @map("attachment_url")
   status         ComplaintStatus @default(RECEIVED)
   createdAt      DateTime        @default(now()) @map("created_at")
   updatedAt      DateTime        @updatedAt @map("updated_at")
@@ -67,7 +66,18 @@ model Complaint {
   user           User            @relation(fields: [userId], references: [id])
   userId         Int   @map("user_id")
 
+  ComplaintAttachments ComplaintAttachments[]
   @@map("complaints")
+}
+
+model ComplaintAttachments {
+  id             Int      @id @default(autoincrement())
+  url            String
+
+  complaint     Complaint @relation(fields: [complaintId], references: [id])
+  complaintId   Int       @map("complaint_id")
+
+  @@map("complaint_attachments")
 }
 
 // solicitações de suporte: jurídico ou psicológico
