@@ -8,15 +8,14 @@ import {
   UploadedFiles,
   UseInterceptors,
   UseGuards,
-  Request,
+  HttpCode,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { CreateComplaintDto } from './dto/create-complaint.dto';
 import { UpdateComplaintStatusDto } from './dto/update-complaint.dto';
 import { ComplaintsService } from './complaints.service';
-import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/decorators/Roles.decorator';
 import { UserRole } from '@prisma/client';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
@@ -24,14 +23,28 @@ import { RoleGuard } from 'src/guards/roles.guard';
 import { GetUser } from 'src/decorators/GetUser.decorator';
 import { UserPayload } from '../auth/interfaces/UserPayload.interface';
 
+class ComplaintResponseDto extends CreateComplaintDto {
+  adminResponse?: string;
+}
+
 @ApiTags('Denúncias - Complaints')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RoleGuard)
 @Controller('complaints')
 export class ComplaintsController {
-  constructor(private readonly complaintsService: ComplaintsService) {}
+  constructor(
+    private readonly complaintsService: ComplaintsService
+  ) {}
 
-  
+  @ApiResponse({
+    status: 201,
+    description: 'Denúncia criada com sucesso',
+    type: ComplaintResponseDto
+  })
+  @ApiBody({
+    description: 'Dados para criação da denúncia',
+    type: CreateComplaintDto,
+  })
   @ApiConsumes('multipart/form-data')
   @Post()
   @UseInterceptors(
@@ -53,6 +66,14 @@ export class ComplaintsController {
     return this.complaintsService.create(dto, files, user);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de denúncias',
+    type: ComplaintResponseDto,
+    isArray: true,
+  })  
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Buscar todas as denúncias de um usuario. Se for admin, a de todos usuarios' })
   @Get()
   async findAll(
     @GetUser() user: UserPayload
@@ -60,7 +81,13 @@ export class ComplaintsController {
     return this.complaintsService.findAll(user);
   }
 
-
+  @ApiResponse({
+    status: 200,
+    description: 'Denúncia encontrada',
+    type: ComplaintResponseDto,
+  })
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Buscar uma denúncia por ID' })
   @Get(':id')
   async findOne(
     @Param('id') id: string, 
@@ -69,6 +96,10 @@ export class ComplaintsController {
     return this.complaintsService.findOne(id, user);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'Status da denúncia atualizado com sucesso'
+  })
   @Patch(':id/status')
   @Roles([UserRole.ADMIN])
   async updateStatus(

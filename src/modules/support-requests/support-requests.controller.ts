@@ -82,6 +82,7 @@ export class SupportRequestsController {
   findOne(@Param('id', ParseIntPipe) id: number, @GetUser() user: UserPayload) {
     return this.supportRequestsService.findOne(id, user.id, user.role);
   }
+  
   @ApiOperation({ summary: 'Atualizar o status de uma solicitação de apoio' })
   @ApiParam({ name: 'id', description: 'ID da solicitação de apoio' })
   @ApiBody({

@@ -6,7 +6,7 @@ import {
 import { DatabaseService } from 'src/database/database.service';
 import { CreateComplaintDto } from './dto/create-complaint.dto';
 import { UpdateComplaintStatusDto } from './dto/update-complaint.dto';
-import { UserRole } from '@prisma/client';
+import { Complaint, UserRole } from '@prisma/client';
 import { UserPayload } from '../auth/interfaces/UserPayload.interface';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class ComplaintsService {
     dto: CreateComplaintDto,
     files: Express.Multer.File[],
     user: UserPayload,
-  ) {
+  ): Promise<Complaint> {
     const attachmentUrl = files && files.length > 0 ? files[0].filename : null;
 
     const complaint = await this.prisma.complaint.create({
