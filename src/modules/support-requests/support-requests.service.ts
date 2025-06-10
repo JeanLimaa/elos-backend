@@ -51,7 +51,7 @@ export class SupportRequestsService {
   }
 
   public async findOne(id: number, userId: number, userRole: UserRole) {
-    const supportRequest = await this.findSupportRequestById(id);
+    const supportRequest = await this.findOrThrowSupportRequestById(id);
 
     if (supportRequest.userId !== userId && userRole !== UserRole.ADMIN) {
       throw new UnauthorizedException(
@@ -67,7 +67,7 @@ export class SupportRequestsService {
     adminId: number,
     updateSupportRequestDto: UpdateSupportRequestStatusDto,
   ) {
-    await this.findSupportRequestById(id);
+    await this.findOrThrowSupportRequestById(id);
 
     return await this.prisma.supportRequest.update({
       where: { id },
@@ -79,14 +79,15 @@ export class SupportRequestsService {
   }
 
   public async remove(id: number) {
-    await this.findSupportRequestById(id);
+    await this.findOrThrowSupportRequestById(id);
 
     await this.prisma.supportRequest.delete({
       where: { id },
     });
   }
+  
 
-  private async findSupportRequestById(id: number) {
+  private async findOrThrowSupportRequestById(id: number) {
     const supportRequest = await this.prisma.supportRequest.findUnique({
       where: { id },
     });

@@ -108,6 +108,26 @@ export class SupportRequestsController {
     );
   }
 
+  @ApiOperation({ summary: 'Marcar o status de uma solicitação de apoio como completo  (Somente usuario comum)' })
+  @ApiParam({ name: 'id', description: 'ID da solicitação de apoio' })
+  @ApiResponse({
+    status: 200,
+    description: 'Status da solicitação de apoio atualizado com sucesso.',
+    type: SupportRequestResponseDto,
+  })
+  @Roles([UserRole.USER])
+  @Patch(':id/status/complete')
+  markAsComplete(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser('id') adminId: number,
+  ) {
+    return this.supportRequestsService.updateStatus(
+      id,
+      adminId,
+      { status: 'COMPLETED' }
+    );
+  }
+
   @ApiOperation({ summary: 'Remover uma solicitação de apoio' })
   @ApiParam({ name: 'id', description: 'ID da solicitação de apoio' })
   @ApiResponse({
