@@ -20,7 +20,7 @@ export class ComplaintsService {
     private readonly complaintAttachmentsService: ComplaintAttachmentsService,
   ) {}
 
-  async create(
+  public async create(
     dto: CreateComplaintDto,
     files: Express.Multer.File[],
     user: UserPayload,
@@ -60,16 +60,7 @@ export class ComplaintsService {
     };
   }
 
-  private async saveAttachments(complaintId: number, files: Express.Multer.File[]): Promise<string[]> {
-    return Promise.all(
-      files.map(async (file) => {
-        const attachment = await this.complaintAttachmentsService.create(complaintId, file.filename);
-        return `${this.attachmentsBaseUrl}/${attachment.url}`;
-      })
-    );
-  }
-
-  async findAll(
+  public async findAll(
     user: UserPayload
   ): Promise<ComplaintResponseDto[]> {
     const complaints = await this.prisma.complaint.findMany({
@@ -101,7 +92,7 @@ export class ComplaintsService {
     });
   }
 
-  async findOne(id: string, user: UserPayload): Promise<ComplaintResponseDto> {
+  public async findOne(id: string, user: UserPayload): Promise<ComplaintResponseDto> {
     const complaint = await this.prisma.complaint.findUnique({
       where: { id: Number(id) },
       include: {
@@ -130,7 +121,9 @@ export class ComplaintsService {
     }
   }
 
-  async updateStatus(id: string, dto: UpdateComplaintStatusDto) {
+  public async updateStatus(id: string, dto: UpdateComplaintStatusDto) {
+    await this.findOrThrowComplaintById(id);
+
     return this.prisma.complaint.update({
       where: { id: Number(id) },
       data: {
@@ -140,14 +133,8 @@ export class ComplaintsService {
     });
   }
 
-  async remove(id: string, userId: number) {
-    const complaint = await this.prisma.complaint.findUnique({
-      where: { id: Number(id) },
-    });
-
-    if (!complaint) {
-      throw new NotFoundException('Denúncia não encontrada');
-    }
+  public async remove(id: string, userId: number) {
+    const complaint = await this.findOrThrowComplaintById(id);
 
     if (complaint.userId !== userId) {
       throw new ForbiddenException('Você não tem permissão para remover esta denúncia');
@@ -156,5 +143,27 @@ export class ComplaintsService {
     await this.prisma.complaint.delete({
       where: { id: Number(id) },
     });
+  }
+  
+
+  private async saveAttachments(complaintId: number, files: Express.Multer.File[]): Promise<string[]> {
+    return Promise.all(
+      files.map(async (file) => {
+        const attachment = await this.complaintAttachmentsService.create(complaintId, file.filename);
+        return `${this.attachmentsBaseUrl}/${attachment.url}`;
+      })
+    );
+  }
+
+  private async findOrThrowComplaintById(id: string) {
+    const complaint = await this.prisma.complaint.findUnique({
+      where: { id: Number(id) },
+    });
+
+    if (!complaint) {
+      throw new NotFoundException('Denúncia não encontrada');
+    }
+
+    return complaint;
   }
 }

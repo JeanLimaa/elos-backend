@@ -37,6 +37,7 @@ export class ComplaintsController {
     private readonly complaintsService: ComplaintsService
   ) {}
 
+  @ApiOperation({ summary: 'Criar nova denúncia' })
   @ApiResponse({
     status: 201,
     description: 'Denúncia criada com sucesso',
@@ -66,7 +67,8 @@ export class ComplaintsController {
   ) {
     return this.complaintsService.create(dto, files, user);
   }
-
+  
+  @ApiOperation({ summary: 'Buscar todas as denúncias de um usuario. Se for admin, a de todos usuarios' })
   @ApiResponse({
     status: 200,
     description: 'Lista de denúncias',
@@ -74,7 +76,6 @@ export class ComplaintsController {
     isArray: true,
   })  
   @HttpCode(200)
-  @ApiOperation({ summary: 'Buscar todas as denúncias de um usuario. Se for admin, a de todos usuarios' })
   @Get()
   async findAll(
     @GetUser() user: UserPayload
@@ -82,13 +83,13 @@ export class ComplaintsController {
     return this.complaintsService.findAll(user);
   }
 
+  @ApiOperation({ summary: 'Buscar uma denúncia por ID' })
   @ApiResponse({
     status: 200,
     description: 'Denúncia encontrada',
     type: ComplaintResponseDto,
   })
   @HttpCode(200)
-  @ApiOperation({ summary: 'Buscar uma denúncia por ID' })
   @Get(':id')
   async findOne(
     @Param('id') id: string, 
@@ -97,10 +98,12 @@ export class ComplaintsController {
     return this.complaintsService.findOne(id, user);
   }
 
+  @ApiOperation({ summary: 'Atualizar o status de uma denúncia (Somente admin)' })
   @ApiResponse({
     status: 200,
     description: 'Status da denúncia atualizado com sucesso'
   })
+  @HttpCode(200)
   @Patch(':id/status')
   @Roles([UserRole.ADMIN])
   async updateStatus(
@@ -108,6 +111,20 @@ export class ComplaintsController {
     @Body() dto: UpdateComplaintStatusDto,
   ) {
     return this.complaintsService.updateStatus(id, dto);
+  }
+
+  @ApiOperation({ summary: 'Marcar uma denúncia como completa (Somente usuario comum)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Status da denúncia atualizado com sucesso'
+  })
+  @HttpCode(200)
+  @Patch(':id/status/completed')
+  @Roles([UserRole.USER])
+  async markAsCompleted(
+    @Param('id') id: string,
+  ) {
+    return this.complaintsService.updateStatus(id, { status: 'COMPLETED' });
   }
 
   @ApiResponse({
