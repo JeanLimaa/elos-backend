@@ -17,6 +17,7 @@ enum ComplaintType {
   VIOLENCE
   DISCRIMINATION
   THREAT
+  HARASSMENT
   OTHER
 }
 
