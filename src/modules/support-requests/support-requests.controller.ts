@@ -116,7 +116,7 @@ export class SupportRequestsController {
     type: SupportRequestResponseDto,
   })
   @Roles([UserRole.USER])
-  @Patch(':id/status/complete')
+  @Patch(':id/status/completed')
   markAsComplete(
     @Param('id', ParseIntPipe) id: number,
     @GetUser('id') adminId: number,
