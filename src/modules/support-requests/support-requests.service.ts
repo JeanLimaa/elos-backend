@@ -78,6 +78,31 @@ export class SupportRequestsService {
     });
   }
 
+  public async updateStatusAsDone(
+    id: number,
+    userId: number,
+    updateSupportRequestDto: UpdateSupportRequestStatusDto,
+  ) {
+    await this.findOrThrowSupportRequestById(id);
+
+    const supportRequest = await this.prisma.supportRequest.findUnique({
+      where: { id },
+    });
+
+    if (supportRequest.userId !== userId) {
+      throw new UnauthorizedException(
+        'Você não tem permissão para atualizar o status desta solicitação de apoio',
+      );
+    }
+
+    return await this.prisma.supportRequest.update({
+      where: { id },
+      data: {
+        status: updateSupportRequestDto.status,
+      },
+    });
+  }
+
   public async remove(id: number) {
     await this.findOrThrowSupportRequestById(id);
 

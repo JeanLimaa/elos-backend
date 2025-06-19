@@ -119,11 +119,11 @@ export class SupportRequestsController {
   @Patch(':id/status/completed')
   markAsComplete(
     @Param('id', ParseIntPipe) id: number,
-    @GetUser('id') adminId: number,
+    @GetUser('id') userId: number,
   ) {
-    return this.supportRequestsService.updateStatus(
+    return this.supportRequestsService.updateStatusAsDone(
       id,
-      adminId,
+      userId,
       { status: 'COMPLETED' }
     );
   }
