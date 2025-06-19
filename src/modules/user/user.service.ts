@@ -5,12 +5,27 @@ import {
 } from '@nestjs/common';
 import { Prisma, UserRole } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
+import { UserResponseDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: DatabaseService) {}
 
-  async findUserById(id: number) {
+  public async findMe(userId: number): Promise<UserResponseDto> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
+
+    const { password, createdAt, ...userData} = user;
+
+    return userData as UserResponseDto;
+  }
+
+  public async findUserById(id: number): Promise<UserResponseDto> {
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
@@ -19,16 +34,18 @@ export class UserService {
       throw new NotFoundException('Usuário não encontrado.');
     }
 
-    return user;
+    const { password, createdAt, ...userData } = user;
+
+    return userData as UserResponseDto;
   }
 
-  async findUserByEmail(email: string) {
+  public async findUserByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email },
     });
   }
 
-  async create(data: Prisma.UserCreateInput) {
+  public async create(data: Prisma.UserCreateInput) {
     const userExists = await this.findUserByEmail(data.email);
 
     if (userExists) {
