@@ -63,8 +63,9 @@ export class ComplaintsService {
   public async findAll(
     user: UserPayload
   ): Promise<ComplaintResponseDto[]> {
+    const isAdmin = user.role === UserRole.ADMIN;
     const complaints = await this.prisma.complaint.findMany({
-      where: user.role === UserRole.ADMIN ? {} : { userId: user.id },
+      where: isAdmin ? {} : { userId: user.id },
       include: {
         ComplaintAttachments: {
           select: { url: true },
@@ -76,6 +77,16 @@ export class ComplaintsService {
             city: true,
           },
         },
+        ...(isAdmin
+          ? {
+              user: {
+                select: {
+                  name: true,
+                  email: true,
+                },
+              },
+            }
+          : {}),
       },
     });
 

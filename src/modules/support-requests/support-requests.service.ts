@@ -46,6 +46,14 @@ export class SupportRequestsService {
           where: {
             OR: [{ handledById: userId }, { handledById: null }],
           },
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              }
+            }
+          }
         });
     }
   }
