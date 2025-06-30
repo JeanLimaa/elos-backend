@@ -59,4 +59,18 @@ export class UserService {
       },
     });
   }
+
+  public async findOrThrowUserById(id: number): Promise<UserResponseDto> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
+
+    const { password, createdAt, ...userData } = user;
+
+    return userData as UserResponseDto;
+  }
 }

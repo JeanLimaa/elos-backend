@@ -17,7 +17,7 @@ export class ComplaintsService {
 
   constructor(
     private prisma: DatabaseService,
-    private readonly complaintAttachmentsService: ComplaintAttachmentsService,
+    private readonly complaintAttachmentsService: ComplaintAttachmentsService
   ) {}
 
   public async create(
@@ -133,7 +133,11 @@ export class ComplaintsService {
   }
 
   public async updateStatus(id: string, dto: UpdateComplaintStatusDto) {
-    await this.findOrThrowComplaintById(id);
+    const complaint = await this.findOrThrowComplaintById(id);
+    
+    if (dto.status === 'COMPLETED' && complaint.status !== 'FORWARDED') {
+      throw new ForbiddenException('Apenas denúncias encaminhadas podem ser marcadas como concluídas');
+    }
 
     return this.prisma.complaint.update({
       where: { id: Number(id) },

@@ -1,7 +1,7 @@
 import {
+  ForbiddenException,
   Injectable,
-  NotFoundException,
-  UnauthorizedException,
+  NotFoundException
 } from '@nestjs/common';
 import { CreateSupportRequestDto } from './dto/create-support-request.dto';
 import { UpdateSupportRequestStatusDto } from './dto/update-support-request.dto';
@@ -62,7 +62,7 @@ export class SupportRequestsService {
     const supportRequest = await this.findOrThrowSupportRequestById(id);
 
     if (supportRequest.userId !== userId && userRole !== UserRole.ADMIN) {
-      throw new UnauthorizedException(
+      throw new ForbiddenException(
         'Você não tem permissão para acessar esta solicitação de apoio',
       );
     }
@@ -76,6 +76,7 @@ export class SupportRequestsService {
     updateSupportRequestDto: UpdateSupportRequestStatusDto,
   ) {
     await this.findOrThrowSupportRequestById(id);
+    await this.userService.findOrThrowUserById(adminId);
 
     return await this.prisma.supportRequest.update({
       where: { id },
@@ -91,16 +92,16 @@ export class SupportRequestsService {
     userId: number,
     updateSupportRequestDto: UpdateSupportRequestStatusDto,
   ) {
-    await this.findOrThrowSupportRequestById(id);
-
-    const supportRequest = await this.prisma.supportRequest.findUnique({
-      where: { id },
-    });
+    const supportRequest = await this.findOrThrowSupportRequestById(id);
 
     if (supportRequest.userId !== userId) {
-      throw new UnauthorizedException(
+      throw new ForbiddenException(
         'Você não tem permissão para atualizar o status desta solicitação de apoio',
       );
+    }
+
+    if (updateSupportRequestDto.status === 'COMPLETED' && supportRequest.status !== 'FORWARDED') {
+      throw new ForbiddenException('Apenas solicitações de apoio encaminhadas podem ser marcadas como concluídas');
     }
 
     return await this.prisma.supportRequest.update({
